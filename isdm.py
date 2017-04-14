@@ -15,6 +15,18 @@ ndim = 1000
 memory_location = 'pam'
 same_vector_distance_threshold = ndim/10
 
+def set_modularity(new_r):
+    global r, _axis_length, r_max, r_min
+    r = new_r
+    _axis_length = r[1]-r[0]+1
+    r_max = r[1]
+    r_min = r[0]
+
+def set_dimensionality(new_ndim):
+    global ndim, same_vector_distance_threshold
+    ndim = new_ndim
+    same_vector_distance_threshold = ndim/10
+
 sin = dict([(key, np.sin(key*del_theta)) for key in range(_axis_length)])
 cos = dict([(key, np.cos(key*del_theta)) for key in range(_axis_length)])
 
@@ -227,13 +239,13 @@ class IntegerSDM(object):
             prev_distances = []
 
         if len(prev_distances) > 1:
-            if prev_distances[-1] < same_vector_distance_threshold or len(prev_distances) > 100:
+            if prev_distances[-1] < same_vector_distance_threshold:
                 print(prev_distances)
                 print("read by convergence")
                 return address
 
             if np.mean([prev_distances[i]-prev_distances[i-1] for i in range(1, len(prev_distances))]) > 0:
-                raise Exception("cannot be read")
+                return None
 
         locations_in_radius = self.hard_locations_in_radius(address)
 
